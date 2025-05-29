@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# IDE-specific
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Flask session files
+instance/flask_session/
+
+uploads/*
+!uploads/.gitkeep
+
+# Generated subtitle files
+generated_subtitles/*
+!generated_subtitles/.gitkeep
+
+# Log files
+*.log
+logs/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# MoviePy temporary files
+*_temp_audio.*
+*_temp_video.*
+
+models/
+
+# Kredensial atau file konfigurasi sensitif
+*.env
+config.py.local
+secrets.ini

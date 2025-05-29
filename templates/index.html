@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembuat Subtitle Otomatis - Project Ai-chan Kawaii!</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message | safe }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="container">
+        <h1>Kyaa~! ✨ Upload Videomu (Deteksi Bahasa Otomatis)!</h1>
+        <p class="subtitle-ai">Ai-chan akan bantu buatkan subtitle otomatis untukmu! (≧◡≦)</p>
+        <p class="subtitle-ai" style="font-size: 0.8em; color: #e91e63;">Maksimum ukuran file: 750MB</p>
+
+        <form method="post" enctype="multipart/form-data" id="uploadForm">
+            <label for="videoFile" class="file-upload-label">
+                Pilih Video (.mp4, .mov, dll.)
+                <span id="fileName">Belum ada file dipilih</span>
+            </label>
+            <input type="file" name="video" id="videoFile" accept=".mp4,.mov,.avi,.mkv,.webm,.flv,.mpeg,.mpg" required>
+            <br>
+            <input type="submit" value="Proses & Buat Subtitle!">
+        </form>
+        <div class="loading-message" id="loadingMessage">
+            Sedang memproses videomu, Kakak... Mohon tunggu sebentar ya! Ini mungkin butuh waktu beberapa menit (atau lebih lama untuk file besar) tergantung ukuran videonya... (づ｡◕‿‿◕｡)づ <br>
+            <small>(Jangan tutup halaman ini!)</small>
+        </div>
+    </div>
+
+    <script>
+        const videoFileInput = document.getElementById('videoFile');
+        const fileNameDisplay = document.getElementById('fileName');
+        const uploadForm = document.getElementById('uploadForm');
+        const submitButton = uploadForm.querySelector('input[type="submit"]');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const maxFileSize = 750 * 1024 * 1024;
+
+        videoFileInput.addEventListener('change', function() {
+            if (videoFileInput.files.length > 0) {
+                const fileSize = videoFileInput.files[0].size;
+                const fileName = videoFileInput.files[0].name;
+                if (fileSize > maxFileSize) {
+                    fileNameDisplay.textContent = `${fileName} - UKURAN FILE TERLALU BESAR!`;
+                    fileNameDisplay.style.color = 'red';
+                    fileNameDisplay.style.fontWeight = 'bold';
+                    alert(`Ukuran file "${fileName}" terlalu besar (${(fileSize / (1024*1024)).toFixed(2)} MB).\nMaksimal 750MB yaa, Kakak! (｡•́︿•̀｡)`);
+                    videoFileInput.value = '';
+                } else {
+                    fileNameDisplay.textContent = `${fileName} (${(fileSize / (1024*1024)).toFixed(2)} MB)`;
+                    fileNameDisplay.style.color = '#555';
+                    fileNameDisplay.style.fontWeight = 'normal';
+                }
+            } else {
+                fileNameDisplay.textContent = 'Belum ada file dipilih';
+                fileNameDisplay.style.color = '#555';
+                fileNameDisplay.style.fontWeight = 'normal';
+            }
+        });
+
+        uploadForm.addEventListener('submit', function(event) {
+            if (videoFileInput.files.length === 0) {
+                alert("Pilih file video dulu ya, Kakak!");
+                event.preventDefault();
+                return;
+            }
+
+            const file = videoFileInput.files[0];
+            if (file.size > maxFileSize) {
+                alert(`Ukuran file "${file.name}" terlalu besar (${(file.size / (1024*1024)).toFixed(2)} MB).\nMaksimal 750MB yaa, Kakak! (｡•́︿•̀｡)`);
+                videoFileInput.value = '';
+                fileNameDisplay.textContent = 'Belum ada file dipilih';
+                fileNameDisplay.style.color = '#555';
+                fileNameDisplay.style.fontWeight = 'normal';
+                event.preventDefault();
+                return;
+            }
+
+            loadingMessage.style.display = 'block';
+            submitButton.disabled = true;
+            submitButton.value = 'Memproses...';
+            if (file.size > 100 * 1024 * 1024) { 
+                 flashTemporaryMessage('File besar terdeteksi, proses mungkin memakan waktu cukup lama.', 'info', 7000);
+            }
+        });
+
+        function flashTemporaryMessage(message, category, duration = 5000) {
+            const flashContainer = document.querySelector('.flash-messages');
+            if (flashContainer) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${category}`;
+                alertDiv.innerHTML = message;
+                flashContainer.appendChild(alertDiv);
+                setTimeout(() => {
+                    alertDiv.style.opacity = '0';
+                    setTimeout(() => alertDiv.remove(), 500);
+                }, duration);
+            }
+        }
+        if (typeof FileReader === "undefined") {
+            console.warn("Browser Anda mungkin tidak mendukung pengecekan ukuran file di sisi klien sepenuhnya.");
+        }
+    </script>
+</body>
+</html>
